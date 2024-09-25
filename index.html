@@ -20,7 +20,7 @@
 
 <style>
     table.matrix {
-        border-spacing: 20px; 
+        border-spacing: 5px; 
         border-left: 2px solid #000;
         border-right: 2px solid #000; 
         border-top-left-radius: 1em; 
@@ -29,6 +29,9 @@
         border-bottom-right-radius: 1em; 
         font-size:20px; 
         text-align:center;
+    }
+    td.matrix {
+        width:50px;
     }
 </style>
 </head>
@@ -89,23 +92,27 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
         <td>
             <h3>\[ R_Z(\gamma) \]</h3>
         </td>
+        <td></td>
+        <td>
+            <h3>\[ R_Y(\alpha) R_X (\beta) R_Z(\gamma) \]</h3>
+        </td>
     </tr>
     <tr>
         <td>
 
             <table class="matrix">
                 <tr>
-                    <td id="calpha1"></td>
-                    <td>0</td>
-                    <td id="salphapos"></td>
+                    <td class="matrix" id="calpha1"></td>
+                    <td class="matrix">0</td>
+                    <td class="matrix" id="salphapos"></td>
                 </tr>
                 <tr>
-                    <td>0</td><td>1</td><td>0</td>
+                    <td class="matrix">0</td><td class="matrix">1</td><td class="matrix">0</td>
                 </tr>
                 <tr>
-                    <td id="salphaneg"></td>
-                    <td>0</td>
-                    <td id="calpha2"></td>
+                    <td class="matrix" id="salphaneg"></td>
+                    <td class="matrix">0</td>
+                    <td class="matrix" id="calpha2"></td>
                 </tr>
             </table>
             </div>
@@ -115,17 +122,19 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
         <td>
             <table class="matrix">
                 <tr>
-                    <td id="cbeta1"></td>
-                    <td>0</td>
-                    <td id="sbetaneg"></td>
+                    <td class="matrix">1</td>
+                    <td class="matrix">0</td>
+                    <td class="matrix">0</td>
                 </tr>
                 <tr>
-                    <td>0</td><td>1</td><td>0</td>
+                    <td class="matrix">0</td>
+                    <td class="matrix" id="cbeta1"></td>
+                    <td class="matrix" id="sbetaneg"></td>
                 </tr>
                 <tr>
-                    <td id="sbetapos"></td>
-                    <td>0</td>
-                    <td id="cbeta2"></td>
+                    <td class="matrix">0</td>
+                    <td class="matrix" id="sbetapos"></td>
+                    <td class="matrix" id="cbeta2"></td>
                 </tr>
             </table>
         </td>
@@ -133,18 +142,18 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
         <td>
             <table class="matrix">
                 <tr>
-                    <td id="cgamma1"></td>
-                    <td id="sgammaneg"></td>
-                    <td>0</td>
+                    <td class="matrix" id="cgamma1"></td>
+                    <td class="matrix" id="sgammaneg"></td>
+                    <td class="matrix">0</td>
                 </tr>
                 <tr>
-                    <td id="sgammapos"></td>
-                    <td id="cgamma2"></td><td>0</td>
+                    <td class="matrix" id="sgammapos"></td>
+                    <td class="matrix" id="cgamma2"></td><td class="matrix">0</td>
                 </tr>
                 <tr>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>1</td>
+                    <td class="matrix">0</td>
+                    <td class="matrix">0</td>
+                    <td class="matrix">1</td>
                 </tr>
             </table>
         </td>
@@ -155,19 +164,19 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
         <td>
             <table class="matrix">
                 <tr>
-                    <td id="r00"></td>
-                    <td id="r01"></td>
-                    <td id="r02"></td>
+                    <td class="matrix" id="r00"></td>
+                    <td class="matrix" id="r01"></td>
+                    <td class="matrix" id="r02"></td>
                 </tr>
                 <tr>
-                    <td id="r10"></td>
-                    <td id="r11"></td>
-                    <td id="r12"></td>
+                    <td class="matrix" id="r10"></td>
+                    <td class="matrix" id="r11"></td>
+                    <td class="matrix" id="r12"></td>
                 </tr>
                 <tr>
-                    <td id="r20"></td>
-                    <td id="r21"></td>
-                    <td id="r22"></td>
+                    <td class="matrix" id="r20"></td>
+                    <td class="matrix" id="r21"></td>
+                    <td class="matrix" id="r22"></td>
                 </tr>
             </table>
         </td>
