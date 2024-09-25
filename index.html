@@ -16,18 +16,35 @@
 <script src="GLEAT/Geometry/Cameras3D.js"></script>
 <script src="GLEAT/Viewers/Shaders.js"></script>
 <script src="GLEAT/Viewers/SimpleMeshCanvas.js"></script>
-<script src="EulerAngles.js"></script>
+<script src="TaitBryan.js"></script>
+
+<style>
+    table.matrix {
+        border-spacing: 20px; 
+        border-left: 2px solid #000;
+        border-right: 2px solid #000; 
+        border-top-left-radius: 1em; 
+        border-top-right-radius: 1em;
+        border-bottom-left-radius: 1em; 
+        border-bottom-right-radius: 1em; 
+        font-size:20px; 
+        text-align:center;
+    }
+</style>
 </head>
 
 <body>
-<h1>Euler Angles Gimbal Visualization</h1>
-<h2>By <a href = "http://www.ctralie.com">Chris Tralie</a> for <a href = "http://www.ctralie.com/Teaching/COMPSCI290/">COMPSCI 290</a>: 3D Digital Geometry</h2>
+<h1>Yaw/Pitch/Roll Gimbal Visualization</h1>
+<h2>By <a href = "http://www.ctralie.com">Chris Tralie</a> </h2>
 
 Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/airbus-a380-27378.html">Airbus A380 Model</a>
+
+
+
 <h3>Directions</h3>
 <ul>
-<li>Manipulate the sliders to change roll/pitch/yaw.  It is also possible to input your own angles and hit the "set" button to update them</li>
-<li>For an animation which does linear interpolation between two sets of Euler angles, choose an initial yaw/pitch/roll next to "orientation1" in the animation menu to the right, as well as a final orientation next to "orientation 2."  You can also automatically fill in the angles corresponding to the current slider positions by clicking "set from current."</li>
+<li>Manipulate the sliders to change yaw/pitch/roll.  It is also possible to input your own angles and hit the "set" button to update them</li>
+<li>For an animation which does linear interpolation between two sets of these angles, choose an initial yaw/pitch/roll next to "orientation1" in the animation menu to the right, as well as a final orientation next to "orientation 2."  You can also automatically fill in the angles corresponding to the current slider positions by clicking "set from current."</li>
 <li>Click the "animate" button to perform linear interpolation between orientation 1 and orientation 2</li>
 <li>Click the "display gimbals" checkbox to toggle displaying of the gimbals.  This may make it easier to view the animation</li>
 <li>To view the gimbals from a different point of view, left click and drag your mouse.  To zoom, right click and drag.  To translate, center click and drag</li>
@@ -38,36 +55,143 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
 <tr><td colspan = "4">
 <canvas id="MainGLCanvas" style="border: none;" width="650" height="600"></canvas>
 </td></tr>
-<tr><td bgcolor = "black"><font color = "#00FF00"><b>Yaw</b></font></td>
+<tr><td bgcolor = "black"><font color = "#00FF00"><b>Yaw (&alpha;)</b></font></td>
 <td>
 <input type="range" id="yawSlider" min = "0" max = "1000" value = "0" step = "1" style="width:450px">
-</td><td><input type="text" id="yawTxt" size="1"></input></td><td><button type="button" id = "yawButton" onclick="callYawSet()">SET</button></td></tr>
+</td><td><input type="text" id="yawTxt" size="4"></input></td><td><button type="button" id = "yawButton" onclick="callYawSet()">SET</button></td></tr>
 
-<tr><td bgcolor = "black"><font color = "cyan"><b>Pitch</b></font></td>
+<tr><td bgcolor = "black"><font color = "cyan"><b>Pitch (&beta;)</b></font></td>
 <td>
 <input type="range" id="pitchSlider" min = "0" max = "1000" value = "0" step = "1" style="width:450px">
-</td><td><input type="text" id="pitchTxt" size="1"></input></td><td><button type="button" id = "pitchButton" onclick="callPitchSet()">SET</button></td></tr>
+</td><td><input type="text" id="pitchTxt" size="4"></input></td><td><button type="button" id = "pitchButton" onclick="callPitchSet()">SET</button></td></tr>
 
 
-<tr><td bgcolor = "black"><font color = "red"><b>Roll</b></font></td>
+<tr><td bgcolor = "black"><font color = "red"><b>Roll (&gamma;)</b></font></td>
 <td>
 <input type="range" id="rollSlider" min = "0" max = "1000" value = "0" step = "1" style="width:450px">
-</td><td><input type="text" id="rollTxt" size="1"></input></td><td><button type="button" id = "rollButton" onclick="callRollSet()">SET</button></td></tr>
+</td><td><input type="text" id="rollTxt" size="4"></input></td><td><button type="button" id = "rollButton" onclick="callRollSet()">SET</button></td></tr>
 </table>
 </td>
 
 <td>
+
+<h1>Matrix Representation</h1>
+
+
+<table style="border-spacing:10px;">
+    <tr>
+        <td>
+            <h3>\[ R_Y(\alpha) \]</h3>
+        </td>
+        <td>
+            <h3>\[ R_X (\beta) \]</h3>
+        </td>
+        <td>
+            <h3>\[ R_Z(\gamma) \]</h3>
+        </td>
+    </tr>
+    <tr>
+        <td>
+
+            <table class="matrix">
+                <tr>
+                    <td id="calpha1"></td>
+                    <td>0</td>
+                    <td id="salphapos"></td>
+                </tr>
+                <tr>
+                    <td>0</td><td>1</td><td>0</td>
+                </tr>
+                <tr>
+                    <td id="salphaneg"></td>
+                    <td>0</td>
+                    <td id="calpha2"></td>
+                </tr>
+            </table>
+            </div>
+        </td>
+
+
+        <td>
+            <table class="matrix">
+                <tr>
+                    <td id="cbeta1"></td>
+                    <td>0</td>
+                    <td id="sbetaneg"></td>
+                </tr>
+                <tr>
+                    <td>0</td><td>1</td><td>0</td>
+                </tr>
+                <tr>
+                    <td id="sbetapos"></td>
+                    <td>0</td>
+                    <td id="cbeta2"></td>
+                </tr>
+            </table>
+        </td>
+
+        <td>
+            <table class="matrix">
+                <tr>
+                    <td id="cgamma1"></td>
+                    <td id="sgammaneg"></td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td id="sgammapos"></td>
+                    <td id="cgamma2"></td><td>0</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <h1>\[ = \]</h1>
+        </td>
+
+        <td>
+            <table class="matrix">
+                <tr>
+                    <td id="r00"></td>
+                    <td id="r01"></td>
+                    <td id="r02"></td>
+                </tr>
+                <tr>
+                    <td id="r10"></td>
+                    <td id="r11"></td>
+                    <td id="r12"></td>
+                </tr>
+                <tr>
+                    <td id="r20"></td>
+                    <td id="r21"></td>
+                    <td id="r22"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+<p>
+<b>NOTE: </b> This configuration is equivalent to the third row of the Tait-Bryan angles table at <a href = "https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix">this link</a>
+</p>
+
 <h1>Animation Menu</h1>
 <table>
 <tr><td>Display Gimbals</td><td><input type="checkbox" id="displayGimbalsCheckbox"/></td></tr>
 </table>
 
 <table border = "1">
-<tr><td></td><td>Yaw</td><td>Pitch</td><td>Roll</td></tr>
-<tr><td>Orientation 1<BR><button type="button" id = "orientation1FromCurrentButton" onclick="callOrientation1SetCurrent()">SET FROM CURRENT</button></td><td><input type="text" id="yaw1" size="1"></input></td><td><input type="text" id="pitch1" size="1"></input></td><td><input type="text" id="roll1" size="1"></input></td></tr>
-<tr><td>Orientation 2<BR><button type="button" id = "orientation2FromCurrentButton" onclick="callOrientation2SetCurrent()">SET FROM CURRENT</button></td><td><input type="text" id="yaw2" size="1"></input></td><td><input type="text" id="pitch2" size="1"></input></td><td><input type="text" id="roll2" size="1"></input></td></tr>
+<tr><td></td><td>Yaw (&alpha;)</td><td>Pitch (&beta;)</td><td>Roll (&gamma;)</td></tr>
+<tr><td>Orientation 1<BR><button type="button" id = "orientation1FromCurrentButton" onclick="callOrientation1SetCurrent()">SET FROM CURRENT</button></td><td><input type="text" id="yaw1" size="4"></input></td><td><input type="text" id="pitch1" size="4"></input></td><td><input type="text" id="roll1" size="4"></input></td></tr>
+<tr><td>Orientation 2<BR><button type="button" id = "orientation2FromCurrentButton" onclick="callOrientation2SetCurrent()">SET FROM CURRENT</button></td><td><input type="text" id="yaw2" size="4"></input></td><td><input type="text" id="pitch2" size="4"></input></td><td><input type="text" id="roll2" size="4"></input></td></tr>
 </table><BR>
 <button type="button" id = "animateButton" onclick="doAnimation()">ANIMATE</button>
+
+
 
 
 </td></tr></table>
@@ -79,6 +203,29 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
 	glcanvas.mesh.loadFile("Airbusa380.off");
 	glcanvas.initGimbals();
 	
+    const calpha1 = document.getElementById("calpha1");
+    const calpha2 = document.getElementById("calpha2");
+    const salphapos = document.getElementById("salphapos");
+    const salphaneg = document.getElementById("salphaneg");
+
+    const cbeta1 = document.getElementById("cbeta1");
+    const cbeta2 = document.getElementById("cbeta2");
+    const sbetapos = document.getElementById("sbetapos");
+    const sbetaneg = document.getElementById("sbetaneg");
+
+    const cgamma1 = document.getElementById("cgamma1");
+    const cgamma2 = document.getElementById("cgamma2");
+    const sgammapos = document.getElementById("sgammapos");
+    const sgammaneg = document.getElementById("sgammaneg");
+
+    let rEntries = [];
+    for (let i = 0; i < 3; i++) {
+        rEntries.push([]);
+        for (let j = 0; j < 3; j++) {
+            rEntries[i].push(document.getElementById("r"+i+""+j))
+        }
+    }
+
 	
 	var displayGimbalsCheckbox = document.getElementById('displayGimbalsCheckbox');
     displayGimbalsCheckbox.addEventListener('change', function(e) {
@@ -201,6 +348,6 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
     }
     
 </script>
-
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>

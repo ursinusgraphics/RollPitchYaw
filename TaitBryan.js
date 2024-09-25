@@ -1,3 +1,107 @@
+
+/**
+ * Creates a matrix from the given angle around the X axis
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.rotateX(dest, dest, rad);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+
+function fromXRotation(out, rad) {
+var s = Math.sin(rad);
+var c = Math.cos(rad); // Perform axis-specific matrix multiplication
+
+out[0] = 1;
+out[1] = 0;
+out[2] = 0;
+out[3] = 0;
+out[4] = 0;
+out[5] = c;
+out[6] = s;
+out[7] = 0;
+out[8] = 0;
+out[9] = -s;
+out[10] = c;
+out[11] = 0;
+out[12] = 0;
+out[13] = 0;
+out[14] = 0;
+out[15] = 1;
+return out;
+}
+/**
+ * Creates a matrix from the given angle around the Y axis
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.rotateY(dest, dest, rad);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+
+function fromYRotation(out, rad) {
+var s = Math.sin(rad);
+var c = Math.cos(rad); // Perform axis-specific matrix multiplication
+
+out[0] = c;
+out[1] = 0;
+out[2] = -s;
+out[3] = 0;
+out[4] = 0;
+out[5] = 1;
+out[6] = 0;
+out[7] = 0;
+out[8] = s;
+out[9] = 0;
+out[10] = c;
+out[11] = 0;
+out[12] = 0;
+out[13] = 0;
+out[14] = 0;
+out[15] = 1;
+return out;
+}
+/**
+ * Creates a matrix from the given angle around the Z axis
+ * This is equivalent to (but much faster than):
+ *
+ *     mat4.identity(dest);
+ *     mat4.rotateZ(dest, dest, rad);
+ *
+ * @param {mat4} out mat4 receiving operation result
+ * @param {Number} rad the angle to rotate the matrix by
+ * @returns {mat4} out
+ */
+
+function fromZRotation(out, rad) {
+var s = Math.sin(rad);
+var c = Math.cos(rad); // Perform axis-specific matrix multiplication
+
+out[0] = c;
+out[1] = s;
+out[2] = 0;
+out[3] = 0;
+out[4] = -s;
+out[5] = c;
+out[6] = 0;
+out[7] = 0;
+out[8] = 0;
+out[9] = 0;
+out[10] = 1;
+out[11] = 0;
+out[12] = 0;
+out[13] = 0;
+out[14] = 0;
+out[15] = 1;
+return out;
+}
+
 function makeCylinderMesh(axis, center, R, H, color) {
     cylinder = new PolyMesh();
     var vertexArr = [];
@@ -60,7 +164,7 @@ function GimbalCanvas(glcanvas) {
 	glcanvas.colorWhite = vec3.fromValues(1.0, 1.0, 1.0);
 	
 	//Setup repaint function	
-	glcanvas.repaint = function() {
+	glcanvas.repaint = async function() {
 		glcanvas.gl.viewport(0, 0, glcanvas.gl.viewportWidth, glcanvas.gl.viewportHeight);
 		glcanvas.gl.clear(glcanvas.gl.COLOR_BUFFER_BIT | glcanvas.gl.DEPTH_BUFFER_BIT);
 		
@@ -70,35 +174,66 @@ function GimbalCanvas(glcanvas) {
 		if (glcanvas.displayGimbals) {
 		    glcanvas.yawConnection.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);	
 	    }
-            
-        var rotYaw = mat4.create();
-        mat4.identity(rotYaw);
-        mat4.rotateY(rotYaw, rotYaw, -glcanvas.yawAngle);
+
+        let rotYaw = fromYRotation(mat4.create(), glcanvas.yawAngle);
+        let rotPitch = fromXRotation(mat4.create(), glcanvas.pitchAngle);
+		let rotRoll = fromZRotation(mat4.create(), glcanvas.rollAngle);
         mat4.multiply(mvMatrix, mvMatrix, rotYaw);
         if (glcanvas.displayGimbals) {
 		    glcanvas.yawgimbal.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);
 		    glcanvas.pitchConnection.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);	
 	    }
-		
-        var rotPitch = mat4.create();
-        mat4.identity(rotPitch);
-        mat4.rotateX(rotPitch, rotPitch, -glcanvas.pitchAngle);
         mat4.multiply(mvMatrix, mvMatrix, rotPitch);
         if (glcanvas.displayGimbals) {
 		    glcanvas.pitchgimbal.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);
 		    glcanvas.rollConnection.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);	
 	    }
-
-		var rotRoll = mat4.create();
-		mat4.identity(rotRoll);
-		mat4.rotateZ(rotRoll, rotRoll, -glcanvas.rollAngle);
 		mat4.multiply(mvMatrix, mvMatrix, rotRoll);
 		if (glcanvas.displayGimbals) {
 		    glcanvas.rollgimbal.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);
 		    glcanvas.meshConnection.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);
 		}
 		glcanvas.mesh.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.ambientColor, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.lightColor);
-		
+
+
+        let c = Math.cos(glcanvas.yawAngle);
+        c = Math.round(c*100)/100;
+        let s = Math.sin(glcanvas.yawAngle);
+        s = Math.round(s*100)/100;
+        calpha1.innerHTML = c;
+        calpha2.innerHTML = c;
+        salphapos.innerHTML = s;
+        salphaneg.innerHTML = -s;
+
+
+        c = Math.cos(glcanvas.pitchAngle);
+        c = Math.round(c*100)/100;
+        s = Math.sin(glcanvas.pitchAngle);
+        s = Math.round(s*100)/100;
+        cbeta1.innerHTML = c;
+        cbeta2.innerHTML = c;
+        sbetapos.innerHTML = s;
+        sbetaneg.innerHTML = -s;
+        
+        c = Math.cos(glcanvas.rollAngle);
+        c = Math.round(c*100)/100;
+        s = Math.sin(glcanvas.rollAngle);
+        s = Math.round(s*100)/100;
+        cgamma1.innerHTML = c;
+        cgamma2.innerHTML = c;
+        sgammapos.innerHTML = s;
+        sgammaneg.innerHTML = -s;
+
+        let R = mat4.create();
+
+        mat4.multiply(R, rotYaw, rotPitch);
+        mat4.multiply(R, R, rotRoll);
+
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                rEntries[i][j].innerHTML = Math.round(100*R[j*4+i])/100;
+            }
+        }
 	}
 	
 }
