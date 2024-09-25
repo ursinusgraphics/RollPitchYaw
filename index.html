@@ -17,8 +17,39 @@
 <script src="GLEAT/Viewers/Shaders.js"></script>
 <script src="GLEAT/Viewers/SimpleMeshCanvas.js"></script>
 <script src="TaitBryan.js"></script>
-
+<link href='https://fonts.googleapis.com/css?family=Lexend Deca' rel='stylesheet'>
 <style>
+        body {
+            background-color: #f8fbf8;
+            padding: 20px;
+            font-family: 'Lexend Deca', serif;
+        }
+        header {
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Roboto Slab', serif;
+        }
+        h1 {
+            font-size: 42px;
+            margin: 0;
+            color: #333;
+        }
+        h2 {
+            font-size: 36px;
+            margin: 0;
+            color: #333;
+        }
+        h3 {
+            font-size: 24px;
+            margin: 0;
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            color: #323030;
+        }
+
     table.matrix {
         border-spacing: 5px; 
         border-left: 2px solid #000;
@@ -33,43 +64,63 @@
     td.matrix {
         width:50px;
     }
+    td.col1 {
+        width:50px;
+        color:#FF0000;
+    }
+    td.col2 {
+        width:50px;
+        color:#00b500;
+    }
+    td.col3 {
+        width:50px;
+        color:#0000FF;
+    }
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.9; 
+    }
+
+    button:active {
+        opacity: 0.6; 
+    }
+
 </style>
 </head>
 
 <body>
 <h1>Yaw/Pitch/Roll Gimbal Visualization</h1>
-<h2>By <a href = "http://www.ctralie.com">Chris Tralie</a> </h2>
+<h3>By <a href = "http://www.ctralie.com">Chris Tralie</a> </h3>
 
-Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/airbus-a380-27378.html">Airbus A380 Model</a>
+<p>
+    Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/airbus-a380-27378.html">Airbus A380 Model</a>
+</p>
 
 
 
-<h3>Directions</h3>
-<ul>
-<li>Manipulate the sliders to change yaw/pitch/roll.  It is also possible to input your own angles and hit the "set" button to update them</li>
-<li>For an animation which does linear interpolation between two sets of these angles, choose an initial yaw/pitch/roll next to "orientation1" in the animation menu to the right, as well as a final orientation next to "orientation 2."  You can also automatically fill in the angles corresponding to the current slider positions by clicking "set from current."</li>
-<li>Click the "animate" button to perform linear interpolation between orientation 1 and orientation 2</li>
-<li>Click the "display gimbals" checkbox to toggle displaying of the gimbals.  This may make it easier to view the animation</li>
-<li>To view the gimbals from a different point of view, left click and drag your mouse.  To zoom, right click and drag.  To translate, center click and drag</li>
-</ul>
-
-<table><tr><td>
-<table border = "1" cellpadding = "5">
+<table style="padding: 20px;"><tr><td>
+<table>
 <tr><td colspan = "4">
 <canvas id="MainGLCanvas" style="border: none;" width="650" height="600"></canvas>
 </td></tr>
-<tr><td bgcolor = "black"><font color = "#00FF00"><b>Yaw (&alpha;)</b></font></td>
+<tr><td style = "color:rgb(47, 123, 174); background-color: #000;"><b>Yaw (&alpha;)</b></td>
 <td>
 <input type="range" id="yawSlider" min = "0" max = "1000" value = "0" step = "1" style="width:450px">
 </td><td><input type="text" id="yawTxt" size="4"></input></td><td><button type="button" id = "yawButton" onclick="callYawSet()">SET</button></td></tr>
 
-<tr><td bgcolor = "black"><font color = "cyan"><b>Pitch (&beta;)</b></font></td>
+<tr><td style = "color:rgb(219, 142, 34); background-color: #000;"><b>Pitch (&beta;)</b></td>
 <td>
 <input type="range" id="pitchSlider" min = "0" max = "1000" value = "0" step = "1" style="width:450px">
 </td><td><input type="text" id="pitchTxt" size="4"></input></td><td><button type="button" id = "pitchButton" onclick="callPitchSet()">SET</button></td></tr>
 
 
-<tr><td bgcolor = "black"><font color = "red"><b>Roll (&gamma;)</b></font></td>
+<tr><td style = "color:rgb(44, 159, 44); background-color: #000;"><b>Roll (&gamma;)</b></td>
 <td>
 <input type="range" id="rollSlider" min = "0" max = "1000" value = "0" step = "1" style="width:450px">
 </td><td><input type="text" id="rollTxt" size="4"></input></td><td><button type="button" id = "rollButton" onclick="callRollSet()">SET</button></td></tr>
@@ -164,19 +215,19 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
         <td>
             <table class="matrix">
                 <tr>
-                    <td class="matrix" id="r00"></td>
-                    <td class="matrix" id="r01"></td>
-                    <td class="matrix" id="r02"></td>
+                    <td class="col1" id="r00"></td>
+                    <td class="col2" id="r01"></td>
+                    <td class="col3" id="r02"></td>
                 </tr>
                 <tr>
-                    <td class="matrix" id="r10"></td>
-                    <td class="matrix" id="r11"></td>
-                    <td class="matrix" id="r12"></td>
+                    <td class="col1" id="r10"></td>
+                    <td class="col2" id="r11"></td>
+                    <td class="col3" id="r12"></td>
                 </tr>
                 <tr>
-                    <td class="matrix" id="r20"></td>
-                    <td class="matrix" id="r21"></td>
-                    <td class="matrix" id="r22"></td>
+                    <td class="col1" id="r20"></td>
+                    <td class="col2" id="r21"></td>
+                    <td class="col3" id="r22"></td>
                 </tr>
             </table>
         </td>
@@ -190,7 +241,9 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
 
 <h1>Animation Menu</h1>
 <table>
+<tr><td>Display Plane</td><td><input type="checkbox" id="displayPlaneCheckbox"/></td></tr>
 <tr><td>Display Gimbals</td><td><input type="checkbox" id="displayGimbalsCheckbox"/></td></tr>
+<tr><td>Display Axes</td><td><input type="checkbox" id="displayAxesCheckbox"/></td></tr>
 </table>
 
 <table border = "1">
@@ -204,6 +257,18 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
 
 
 </td></tr></table>
+
+<HR>
+
+
+<h3>Directions</h3>
+<ul>
+<li>Manipulate the sliders to change yaw/pitch/roll.  It is also possible to input your own angles and hit the "set" button to update them</li>
+<li>For an animation which does linear interpolation between two sets of these angles, choose an initial yaw/pitch/roll next to "orientation1" in the animation menu to the right, as well as a final orientation next to "orientation 2."  You can also automatically fill in the angles corresponding to the current slider positions by clicking "set from current."</li>
+<li>Click the "animate" button to perform linear interpolation between orientation 1 and orientation 2</li>
+<li>Click the "display gimbals" checkbox to toggle displaying of the gimbals.  This may make it easier to view the animation</li>
+<li>To view the gimbals from a different point of view, left click and drag your mouse.  To zoom, right click and drag.  To translate, center click and drag</li>
+</ul>
 
 <script>
 	$('body').on('contextmenu', '#MainGLCanvas', function(e){ return false; }); //Need this to disable the menu that pops up on right clicking
@@ -236,12 +301,26 @@ Special thanks to 3dregenerator for the <a href = "http://tf3dm.com/3d-model/air
     }
 
 	
+	var displayPlaneCheckbox = document.getElementById('displayPlaneCheckbox');
+    displayPlaneCheckbox.addEventListener('change', function(e) {
+        glcanvas.displayPlane = displayPlaneCheckbox.checked;
+        requestAnimFrame(glcanvas.repaint);
+    });
+    displayPlaneCheckbox.checked = true;
+
 	var displayGimbalsCheckbox = document.getElementById('displayGimbalsCheckbox');
     displayGimbalsCheckbox.addEventListener('change', function(e) {
         glcanvas.displayGimbals = displayGimbalsCheckbox.checked;
         requestAnimFrame(glcanvas.repaint);
     });
     displayGimbalsCheckbox.checked = true;
+
+	var displayAxesCheckbox = document.getElementById('displayAxesCheckbox');
+    displayAxesCheckbox.addEventListener('change', function(e) {
+        glcanvas.displayAxes = displayAxesCheckbox.checked;
+        requestAnimFrame(glcanvas.repaint);
+    });
+    displayAxesCheckbox.checked = true;
 	
 	//Yaw stuff
 	var yawSlider = document.getElementById('yawSlider');

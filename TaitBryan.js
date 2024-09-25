@@ -131,7 +131,9 @@ function makeCylinderMesh(axis, center, R, H, color) {
 function GimbalCanvas(glcanvas) {
     SimpleMeshCanvas(glcanvas, "GLEAT/Viewers"); //Call the boilerplate code to set up mouse interaction
     
+    glcanvas.displayPlane = true;
     glcanvas.displayGimbals = true;
+    glcanvas.displayAxes = true;
     
     glcanvas.initGimbals = function() {
         var bbox = this.mesh.getBBox();
@@ -143,13 +145,13 @@ function GimbalCanvas(glcanvas) {
         var R = bbox.getDiagLength();
         var H = R/20.0;
         
-        this.yawgimbal = makeCylinderMesh([0, 1, 2], center, R, H, vec3.fromValues(0, 1, 0));
+        this.yawgimbal = makeCylinderMesh([0, 1, 2], center, R, H, vec3.fromValues(0.122, 0.467, 0.706));
         this.yawConnection = makeCylinderMesh([0, 2, 1], vec3.fromValues(center[0], center[1]-R*(1+1/10.0), center[2]), H/3, R/5.0, vec3.fromValues(0.5, 0.5, 0.5));
         
-        this.pitchgimbal = makeCylinderMesh([0, 2, 1], center, R-R/20, H, vec3.fromValues(0, 1, 1));
+        this.pitchgimbal = makeCylinderMesh([0, 2, 1], center, R-R/20, H, vec3.fromValues(1, 0.498, 0.055));
         this.pitchConnection = makeCylinderMesh([1, 2, 0], vec3.fromValues(center[0]+R-R/20, center[1], center[2]), H/3, R/10.0, vec3.fromValues(0.5, 0.5, 0.5));
         
-        this.rollgimbal = makeCylinderMesh([1, 2, 0], center, R-R/10, H, vec3.fromValues(1, 0, 0));
+        this.rollgimbal = makeCylinderMesh([1, 2, 0], center, R-R/10, H, vec3.fromValues(0.173, 0.627, 0.173));
         this.rollConnection = makeCylinderMesh([0, 1, 2], vec3.fromValues(center[0], center[1], center[2]+R*(1-1/10.0)), H/3, R/10.0);
         
         this.meshConnection = makeCylinderMesh([0, 2, 1], vec3.fromValues(center[0], center[1]+R/2-R/10, center[2]), H/4, R*1.02, vec3.fromValues(0.5, 0.5, 0.5));
@@ -158,6 +160,11 @@ function GimbalCanvas(glcanvas) {
         this.pitchAngle = 0.0;
         this.rollAngle = 0.0;
         this.camera.centerOnMesh(this.yawgimbal);
+        this.camera.theta = -Math.PI/2;
+
+        this.axisXMesh = makeCylinderMesh([1, 2, 0], vec3.fromValues(center[0]+R*0.15, center[1], center[2]), H/3, R*0.3, vec3.fromValues(1, 0, 0));
+        this.axisYMesh = makeCylinderMesh([0, 2, 1], vec3.fromValues(center[0], center[1]+R*0.15, center[2]), H/3, R*0.3, vec3.fromValues(0, 1, 0));
+        this.axisZMesh = makeCylinderMesh([0, 1, 2], [center[0]+H/10, center[1], center[2]+R*0.15], H/3, R*0.3, vec3.fromValues(0, 0, 1));
     }
 
 	glcanvas.colorBlack = vec3.fromValues(0.0, 0.0, 0.0);
@@ -193,7 +200,16 @@ function GimbalCanvas(glcanvas) {
 		    glcanvas.rollgimbal.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);
 		    glcanvas.meshConnection.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);
 		}
-		glcanvas.mesh.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.ambientColor, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.lightColor);
+        if (glcanvas.displayPlane) {
+            glcanvas.mesh.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.ambientColor, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.lightColor);
+        }
+
+        if (glcanvas.displayAxes) {
+            glcanvas.axisXMesh.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.ambientColor, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.lightColor);
+            glcanvas.axisYMesh.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.ambientColor, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.lightColor);
+            glcanvas.axisZMesh.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.ambientColor, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.lightColor);
+        }
+
 
 
         let c = Math.cos(glcanvas.yawAngle);
