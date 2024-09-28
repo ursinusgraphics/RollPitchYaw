@@ -78,9 +78,8 @@ function GimbalCanvas(glcanvas) {
 		    glcanvas.yawConnection.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);	
 	    }
 
-        let rotYaw = fromYRotation(glcanvas.yawAngle);
-        let rotPitch = fromXRotation(glcanvas.pitchAngle);
-		let rotRoll = fromZRotation(glcanvas.rollAngle);
+        let res = yawPitchRoll2Rot(glcanvas.yawAngle, glcanvas.pitchAngle, glcanvas.rollAngle);
+        let R = res["R"], rotYaw = res["rotYaw"], rotPitch = res["rotPitch"], rotRoll = res["rotRoll"];
         mat4.multiply(mvMatrix, mvMatrix, rotYaw);
         if (glcanvas.displayGimbals) {
 		    glcanvas.yawgimbal.render(glcanvas.gl, colorShader, pMatrix, mvMatrix, glcanvas.colorWhite, glcanvas.light1Pos, glcanvas.light2Pos, glcanvas.ambientColor);
@@ -135,11 +134,6 @@ function GimbalCanvas(glcanvas) {
         cgamma2.innerHTML = c;
         sgammapos.innerHTML = s;
         sgammaneg.innerHTML = -s;
-
-        let R = mat4.create();
-
-        mat4.multiply(R, rotYaw, rotPitch);
-        mat4.multiply(R, R, rotRoll);
 
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
